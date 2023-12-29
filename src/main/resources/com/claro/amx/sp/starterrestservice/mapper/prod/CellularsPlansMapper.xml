@@ -1,0 +1,32 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.claro.amx.sp.starterrestservice.mapper.prod.CellularsPlansMapper">
+
+    <resultMap id="map_GetCellularPlansDataResult"
+               type="com.claro.amx.sp.starterrestservice.model.prod.CellularsPlans">
+        <result property="cellularNumber" column="CLU_CELLULAR_NUMBER"/>
+        <result property="billNumber" column="CLU_BILL_NUMBER"/>
+        <result property="businessType" column="CLU_CBT_ID"/>
+        <result property="planId" column="CPL_RPL_ID"/>
+        <result property="cluType" column="CLU_TYPE"/>
+    </resultMap>
+    <select id="getCellularsPlansData" resultMap="map_GetCellularPlansDataResult">
+        SELECT
+        CLU_CELLULAR_NUMBER,
+        CLU_BILL_NUMBER,
+        CLU_CBT_ID,
+        CPL_RPL_ID,
+        CLU_TYPE
+        FROM
+        CELLULAR_PLANS,
+        CELLULARS
+        WHERE
+        (CLU_CELLULAR_NUMBER = #{cellularNumber} OR CLU_BILL_NUMBER = #{cellularNumber})
+        AND CPL_CLU_CELLULAR_NUMBER = CLU_CELLULAR_NUMBER
+        AND ((SYSDATE BETWEEN CPL_START_DATE AND NVL(CPL_END_DATE, SYSDATE + 1) AND NVL(CPL_RPL_ONLINE, 'N') = 'N')
+        OR ((NVL(CPL_END_DATE, SYSDATE) >= SYSDATE) AND NVL(CPL_RPL_ONLINE, 'N') = 'Y'))
+        AND CPL_STG_ID = 'AH'
+        ORDER BY CPL_ADD_DATE DESC
+    </select>
+</mapper>
